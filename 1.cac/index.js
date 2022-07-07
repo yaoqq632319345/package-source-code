@@ -1,13 +1,24 @@
+/* // 基本使用
 const cli = require('cac')();
-cli.on('command:*', () => {
-  console.log(123);
+
+cli.option('--type <type>', 'Choose a project type', {
+  default: 'node',
 });
+
+const parsed = cli.parse();
+
+console.log(JSON.stringify(parsed, null, 2)); */
+
+// 注册子命令
+const cli = require('cac')();
+
 cli
-  // Simply omit the command name, just brackets
-  .command('rm <dir>', 'remove')
-  .action((files, options) => {
-    console.log(files);
-    console.log(options);
+  .command('rm <dir>', 'Remove a dir')
+  .option('-r, --recursive', 'Remove recursively')
+  .action((dir, options) => {
+    console.log('remove ' + dir + (options.recursive ? ' recursively' : ''));
   });
+
 cli.help();
+
 cli.parse();
