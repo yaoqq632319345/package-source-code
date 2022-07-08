@@ -135,3 +135,85 @@ if (rawName.includes('<')) { // 尖括号必传
 ```
 
 - option 方法 就是注册一个 option 对象，处理一下参数形式和兼容，之后 push 到 command 里
+
+### parse 方法
+
+- 前面都是初始化相关
+
+```ts
+class CAC {
+  ...
+  parse(
+    argv = processArgs,
+    {
+      // 这个参数可以看下面改为false的情况，即获取帮助和版本的时候不执行任何动作
+      run = true,
+    } = {}
+  ): ParsedArgv {
+    this.rawArgs = argv;
+    let shouldParse = true; // 下面三个动作按优先执行
+
+    // 遍历已注册的子命令，找到匹配的就执行
+  for (const command of this.commands) {
+      const parsed = this.mri(argv.slice(2), command)
+      const commandName = parsed.args[0]
+      if (command.isMatched(commandName)) {
+        shouldParse = false
+        const parsedInfo = {
+          ...parsed,
+          args: parsed.args.slice(1),
+        }
+        this.setParsedInfo(parsedInfo, command, commandName)
+        this.emit(`command:${commandName}`, command)
+      }
+    }
+    // 如果没有匹配上子命令，则执行默认命令
+    if (shouldParse) {
+      for (const command of this.commands) {
+        if (command.name === '') {
+          shouldParse = false
+          const parsed = this.mri(argv.slice(2), command)
+          this.setParsedInfo(parsed, command)
+          this.emit(`command:!`, command)
+        }
+      }
+    }
+    // 如果都没有则仅保存一下参数
+    if (shouldParse) {
+      const parsed = this.mri(argv.slice(2))
+      this.setParsedInfo(parsed)
+    }
+    // 帮助信息
+    if (this.options.help && this.showHelpOnExit) {
+      this.outputHelp()
+      run = false
+      this.unsetMatchedCommand()
+    }
+    // 版本信息
+    if (
+      this.options.version &&
+      this.showVersionOnExit &&
+      this.matchedCommandName == null
+    ) {
+      this.outputVersion()
+      run = false
+      this.unsetMatchedCommand()
+    }
+
+    const parsedArgv = { args: this.args, options: this.options }
+
+    if (run) {
+      this.runMatchedCommand()
+    }
+
+    if (!this.matchedCommand && this.args[0]) {
+      this.emit('command:*')
+    }
+
+    return parsedArgv
+  }
+  ...
+}
+```
+
+- 上面三个 emit 可以让你注册对应的事件执行回调
