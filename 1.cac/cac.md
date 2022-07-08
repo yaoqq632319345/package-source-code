@@ -217,3 +217,22 @@ class CAC {
 ```
 
 - 上面三个 emit 可以让你注册对应的事件执行回调
+- 官方文档示例：
+
+```js
+// Listen to the `foo` command
+cli.on('command:foo', () => {
+  // Do something
+});
+
+// Listen to the default command
+cli.on('command:!', () => {
+  // Do something
+});
+
+// Listen to unknown commands
+cli.on('command:*', () => {
+  console.error('Invalid command: %s', cli.args.join(' '));
+  process.exit(1);
+});
+```
