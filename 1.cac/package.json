@@ -12,7 +12,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "mri": "^1.2.0"
+  },
   "devDependencies": {
     "@types/jest": "^28.1.4",
     "cac": "^6.7.12",

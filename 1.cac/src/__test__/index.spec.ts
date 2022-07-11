@@ -10,3 +10,15 @@ test('should ', () => {
 
   expect(parsed).toEqual({ args: [], options: { type: 't', '--': [] } });
 });
+
+test('should ', () => {
+  const cli = myCac();
+
+  cli.option('--aaa <aaa>', 'Choose a aaaa', {
+    default: 'aaa',
+  });
+
+  const parsed = cli.parse(['node', 'file', '--aaa', 'bbb']);
+
+  expect(parsed).toEqual({ args: [], options: { aaa: 'bbb', '--': [] } });
+});
